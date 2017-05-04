@@ -77,7 +77,11 @@ open class SCLButton: UIButton {
     var customTextColor:UIColor?
     var initialTitle:String!
     var showTimeout:ShowTimeoutConfiguration?
+    var size: SCLButton.SizeClass = .full
     
+    enum SizeClass {
+        case full, half, third, quarter
+    }
     public struct ShowTimeoutConfiguration {
         let prefix: String
         let suffix: String
@@ -138,11 +142,15 @@ public typealias DismissBlock = () -> Void
 open class SCLAlertView: UIViewController {
     
     public struct SCLAppearance {
+        let kItemPadding: CGFloat
         let kDefaultShadowOpacity: CGFloat
+        
         let kCircleTopPosition: CGFloat
         let kCircleBackgroundTopPosition: CGFloat
         let kCircleHeight: CGFloat
+        let kCircleCornerRadius: CGFloat
         let kCircleIconHeight: CGFloat
+        let kCircleIconCornerRadius: CGFloat
         let kTitleTop:CGFloat
         let kTitleHeight:CGFloat
 	let kTitleMinimumScaleFactor: CGFloat
@@ -155,6 +163,7 @@ open class SCLAlertView: UIViewController {
 		let circleBackgroundColor: UIColor
         let contentViewColor: UIColor
         let contentViewBorderColor: UIColor
+        let contentViewBorderWidth: CGFloat
         let titleColor: UIColor
         
         // Fonts
@@ -175,13 +184,17 @@ open class SCLAlertView: UIViewController {
         // Actions
         var hideWhenBackgroundViewIsTapped: Bool
         
-        public init(kDefaultShadowOpacity: CGFloat = 0.7, kCircleTopPosition: CGFloat = 0.0, kCircleBackgroundTopPosition: CGFloat = 6.0, kCircleHeight: CGFloat = 56.0, kCircleIconHeight: CGFloat = 20.0, kTitleTop:CGFloat = 30.0, kTitleHeight:CGFloat = 25.0,  kWindowWidth: CGFloat = 240.0, kWindowHeight: CGFloat = 178.0, kTextHeight: CGFloat = 90.0, kTextFieldHeight: CGFloat = 45.0, kTextViewdHeight: CGFloat = 80.0, kButtonHeight: CGFloat = 45.0, kTitleFont: UIFont = UIFont.systemFont(ofSize: 20), kTitleMinimumScaleFactor: CGFloat = 1.0, kTextFont: UIFont = UIFont.systemFont(ofSize: 14), kButtonFont: UIFont = UIFont.boldSystemFont(ofSize: 14), showCloseButton: Bool = true, showCircularIcon: Bool = true, shouldAutoDismiss: Bool = true, contentViewCornerRadius: CGFloat = 5.0, fieldCornerRadius: CGFloat = 3.0, buttonCornerRadius: CGFloat = 3.0, hideWhenBackgroundViewIsTapped: Bool = false, circleBackgroundColor: UIColor = UIColor.white, contentViewColor: UIColor = UIColorFromRGB(0xFFFFFF), contentViewBorderColor: UIColor = UIColorFromRGB(0xCCCCCC), titleColor: UIColor = UIColorFromRGB(0x4D4D4D), dynamicAnimatorActive: Bool = false, disableTapGesture: Bool = false ) {
+        public init(kItemPadding: CGFloat = 14.0, kDefaultShadowOpacity: CGFloat = 0.7, kCircleTopPosition: CGFloat = -12.0, kCircleBackgroundTopPosition: CGFloat = -15.0, kCircleHeight: CGFloat = 56.0, kCircleCornerRadius: CGFloat = 28.0, kCircleIconHeight: CGFloat = 52.0, kCircleIconCornerRadius:CGFloat = 26.0, kTitleTop:CGFloat = 30.0, kTitleHeight:CGFloat = 25.0, kWindowWidth: CGFloat = 240.0, kWindowHeight: CGFloat = 178.0, kTextHeight: CGFloat = 90.0, kTextFieldHeight: CGFloat = 45.0, kTextViewdHeight: CGFloat = 80.0, kButtonHeight: CGFloat = 45.0, kTitleFont: UIFont = UIFont.systemFont(ofSize: 20), kTitleMinimumScaleFactor: CGFloat = 1.0, kTextFont: UIFont = UIFont.systemFont(ofSize: 14), kButtonFont: UIFont = UIFont.boldSystemFont(ofSize: 14), showCloseButton: Bool = true, showCircularIcon: Bool = true, shouldAutoDismiss: Bool = true, contentViewCornerRadius: CGFloat = 5.0, fieldCornerRadius: CGFloat = 3.0, buttonCornerRadius: CGFloat = 3.0, hideWhenBackgroundViewIsTapped: Bool = false, circleBackgroundColor: UIColor = UIColor.white, contentViewColor: UIColor = UIColorFromRGB(0xFFFFFF), contentViewBorderColor: UIColor = UIColorFromRGB(0xCCCCCC), contentViewBorderWidth: CGFloat = 0.5, titleColor: UIColor = UIColorFromRGB(0x4D4D4D), dynamicAnimatorActive: Bool = false, disableTapGesture: Bool = false ) {
             
+            self.kItemPadding = kItemPadding
             self.kDefaultShadowOpacity = kDefaultShadowOpacity
             self.kCircleTopPosition = kCircleTopPosition
             self.kCircleBackgroundTopPosition = kCircleBackgroundTopPosition
             self.kCircleHeight = kCircleHeight
+            self.kCircleCornerRadius = kCircleCornerRadius
             self.kCircleIconHeight = kCircleIconHeight
+            self.kCircleIconCornerRadius = kCircleIconCornerRadius
+            
             self.kTitleTop = kTitleTop
             self.kTitleHeight = kTitleHeight
             self.kWindowWidth = kWindowWidth
@@ -193,6 +206,7 @@ open class SCLAlertView: UIViewController {
 			self.circleBackgroundColor = circleBackgroundColor
             self.contentViewColor = contentViewColor
             self.contentViewBorderColor = contentViewBorderColor
+            self.contentViewBorderWidth = contentViewBorderWidth
             self.titleColor = titleColor
             
             self.kTitleFont = kTitleFont
@@ -298,17 +312,17 @@ open class SCLAlertView: UIViewController {
         // Content View
         contentView.layer.cornerRadius = appearance.contentViewCornerRadius
         contentView.layer.masksToBounds = true
-        contentView.layer.borderWidth = 0.5
+        contentView.layer.borderWidth = appearance.contentViewBorderWidth
         contentView.addSubview(labelTitle)
         contentView.addSubview(viewText)
         // Circle View
         circleBG.backgroundColor = appearance.circleBackgroundColor
-        circleBG.layer.cornerRadius = circleBG.frame.size.height / 2
+        circleBG.layer.cornerRadius = 6// circleBG.frame.size.height / 2
         baseView.addSubview(circleBG)
         circleBG.addSubview(circleView)
         let x = (kCircleHeightBackground - appearance.kCircleHeight) / 2
-        circleView.frame = CGRect(x:x, y:x+appearance.kCircleTopPosition, width:appearance.kCircleHeight, height:appearance.kCircleHeight)
-        circleView.layer.cornerRadius = circleView.frame.size.height / 2
+        circleView.frame = CGRect(x:x, y:x, width:appearance.kCircleHeight, height:appearance.kCircleHeight)
+        circleView.layer.cornerRadius = appearance.kCircleCornerRadius // circleView.frame.size.height / 2
         // Title
         labelTitle.numberOfLines = 0
         labelTitle.textAlignment = .center
@@ -326,7 +340,8 @@ open class SCLAlertView: UIViewController {
         viewText.font = appearance.kTextFont
         // Colours
         contentView.backgroundColor = appearance.contentViewColor
-        viewText.backgroundColor = appearance.contentViewColor
+        labelTitle.backgroundColor = UIColor.clear
+        viewText.backgroundColor = UIColor.clear
         labelTitle.textColor = appearance.titleColor
         viewText.textColor = appearance.titleColor
         contentView.layer.borderColor = appearance.contentViewBorderColor.cgColor
@@ -345,27 +360,61 @@ open class SCLAlertView: UIViewController {
         
         // Set background frame
         view.frame.size = sz
-
-        let hMargin: CGFloat = 12
-
-        // get actual height of title text
-        var titleActualHeight: CGFloat = 0
-        if let title = labelTitle.text {
-          titleActualHeight = title.heightWithConstrainedWidth(width: appearance.kWindowWidth - hMargin * 2, font: labelTitle.font) + 10
-          // get the larger height for the title text
-          titleActualHeight = (titleActualHeight > appearance.kTitleHeight ? titleActualHeight : appearance.kTitleHeight)
-        }
-
+        
+        let itemPadding = appearance.kItemPadding
         // computing the right size to use for the textView
         let maxHeight = sz.height - 100 // max overall height
         var consumedHeight = CGFloat(0)
-        consumedHeight += (titleActualHeight > 0 ? appearance.kTitleTop + titleActualHeight : hMargin)
-        consumedHeight += 14
-        consumedHeight += appearance.kButtonHeight * CGFloat(buttons.count)
+        consumedHeight += appearance.kTitleTop + labelTitle.frame.size.height
+        consumedHeight += itemPadding
+        
+        
+        var col = 0
+        var rowCount:CGFloat = 0
+        for btn in buttons{
+            
+            switch btn.size {
+            case .half:
+                if col == 0{
+                    rowCount += 1
+                    col += 1
+                }else{
+                    
+                    col = 0
+                }
+            case .third:
+                if col == 0{
+                    rowCount += 1
+                    col += 1
+                }else if col >= 2{
+                    col = 0
+                }else{
+                    col += 1
+                }
+            case .quarter:
+                if col == 0{
+                    rowCount += 1
+                    col += 1
+                }else if col >= 3{
+                    col = 0
+                }else{
+                    col += 1
+                }
+            default:
+                col = 0
+                rowCount += 1
+            }
+            
+            
+        }
+        
+        
+        consumedHeight += (appearance.kButtonHeight + itemPadding) * rowCount
+        
         consumedHeight += appearance.kTextFieldHeight * CGFloat(inputs.count)
         consumedHeight += appearance.kTextViewdHeight * CGFloat(input.count)
         let maxViewTextHeight = maxHeight - consumedHeight
-        let viewTextWidth = appearance.kWindowWidth - hMargin * 2
+        let viewTextWidth = appearance.kWindowWidth - (itemPadding*2)
         var viewTextHeight = appearance.kTextHeight
         
         // Check if there is a custom subview and add it over the textview
@@ -374,53 +423,104 @@ open class SCLAlertView: UIViewController {
             viewText.text = ""
             viewText.addSubview(customSubview)
         } else {
-            // computing the right size to use for the textView
-            let suggestedViewTextSize = viewText.sizeThatFits(CGSize(width: viewTextWidth, height: CGFloat.greatestFiniteMagnitude))
-            viewTextHeight = min(suggestedViewTextSize.height, maxViewTextHeight)
-            
-            // scroll management
-            if (suggestedViewTextSize.height > maxViewTextHeight) {
-                viewText.isScrollEnabled = true
-            } else {
-                viewText.isScrollEnabled = false
+            if !viewText.text.isEmpty{
+                // computing the right size to use for the textView
+                let suggestedViewTextSize = viewText.sizeThatFits(CGSize(width: viewTextWidth, height: CGFloat.greatestFiniteMagnitude))
+                viewTextHeight = min(suggestedViewTextSize.height, maxViewTextHeight)
+                
+                // scroll management
+                if (suggestedViewTextSize.height > maxViewTextHeight) {
+                    viewText.isScrollEnabled = true
+                } else {
+                    viewText.isScrollEnabled = false
+                }
+            }else{
+                viewTextHeight = 0
             }
         }
         
-        let windowHeight = consumedHeight + viewTextHeight
+        var windowHeight = consumedHeight
+            
+        if viewTextHeight > 0{
+            windowHeight += viewTextHeight + itemPadding
+        }
         // Set frames
         var x = (sz.width - appearance.kWindowWidth) / 2
-        var y = (sz.height - windowHeight - (appearance.kCircleHeight / 8)) / 2
+        var y = (sz.height - windowHeight) / 2
         contentView.frame = CGRect(x:x, y:y, width:appearance.kWindowWidth, height:windowHeight)
         contentView.layer.cornerRadius = appearance.contentViewCornerRadius
-        y -= kCircleHeightBackground * 0.6
+        
         x = (sz.width - kCircleHeightBackground) / 2
-        circleBG.frame = CGRect(x:x, y:y+appearance.kCircleBackgroundTopPosition, width:kCircleHeightBackground, height:kCircleHeightBackground)
+        circleBG.frame = CGRect(x:x, y:y+appearance.kCircleTopPosition, width:kCircleHeightBackground, height:kCircleHeightBackground)
         
         //adjust Title frame based on circularIcon show/hide flag
         let titleOffset : CGFloat = appearance.showCircularIcon ? 0.0 : -12.0
         labelTitle.frame = labelTitle.frame.offsetBy(dx: 0, dy: titleOffset)
         
         // Subtitle
-        y = titleActualHeight > 0 ? appearance.kTitleTop + titleActualHeight + titleOffset : hMargin
-        viewText.frame = CGRect(x:hMargin, y:y, width: appearance.kWindowWidth - hMargin * 2, height:appearance.kTextHeight)
-        viewText.frame = CGRect(x:hMargin, y:y, width: viewTextWidth, height:viewTextHeight)
+        y = appearance.kTitleTop + labelTitle.frame.size.height + titleOffset + itemPadding
+//        viewText.frame = CGRect(x:12, y:y, width: appearance.kWindowWidth - 24, height:appearance.kTextHeight)
+        viewText.frame = CGRect(x:itemPadding, y:y, width: viewTextWidth, height:viewTextHeight)
         // Text fields
-        y += viewTextHeight + 14.0
+        if viewTextHeight > 0{
+            y += viewTextHeight + itemPadding
+        }
+        
         for txt in inputs {
-            txt.frame = CGRect(x:hMargin, y:y, width:appearance.kWindowWidth - hMargin * 2, height:30)
+            txt.frame = CGRect(x:itemPadding, y:y, width:appearance.kWindowWidth - (itemPadding*2), height:30)
             txt.layer.cornerRadius = appearance.fieldCornerRadius
             y += appearance.kTextFieldHeight
         }
         for txt in input {
-            txt.frame = CGRect(x:hMargin, y:y, width:appearance.kWindowWidth - hMargin * 2, height:70)
+            txt.frame = CGRect(x:itemPadding, y:y, width:appearance.kWindowWidth - (itemPadding*2), height:70)
             //txt.layer.cornerRadius = fieldCornerRadius
             y += appearance.kTextViewdHeight
         }
         // Buttons
+        let maxWidth = appearance.kWindowWidth - (itemPadding * 2)
+        
+        var column:CGFloat = 0
+        let halfWidth = (maxWidth - itemPadding)/2
+        let thirdWidth = (maxWidth - (itemPadding*2))/3
+        let quarterWidth = (maxWidth - (itemPadding*3))/4
+        
         for btn in buttons {
-            btn.frame = CGRect(x:hMargin, y:y, width:appearance.kWindowWidth - hMargin * 2, height:35)
             btn.layer.cornerRadius = appearance.buttonCornerRadius
-            y += appearance.kButtonHeight
+            
+            switch btn.size {
+            
+            case .half:
+                btn.frame = CGRect(x:itemPadding + (halfWidth + itemPadding) * column, y:y, width:halfWidth, height:appearance.kButtonHeight)
+                
+                if column == 0{
+                    column += 1
+                }else{
+                    column = 0
+                    y += appearance.kButtonHeight + itemPadding
+                }
+            case .third:
+                btn.frame = CGRect(x:itemPadding + (thirdWidth + itemPadding) * column, y:y, width:thirdWidth, height:appearance.kButtonHeight)
+                    
+                if column < 2{
+                    column += 1
+                }else{
+                    column = 0
+                    y += appearance.kButtonHeight + itemPadding
+                }
+            case .quarter:
+                btn.frame = CGRect(x:itemPadding + (quarterWidth + itemPadding) * column, y:y, width:quarterWidth, height:appearance.kButtonHeight)
+                
+                if column < 3{
+                    column += 1
+                }else{
+                    column = 0
+                    y += appearance.kButtonHeight + itemPadding
+                }
+            default:
+                column = 0
+                btn.frame = CGRect(x:itemPadding, y:y, width:maxWidth, height:appearance.kButtonHeight)
+                y += appearance.kButtonHeight + itemPadding
+            }
         }
     }
     
@@ -508,6 +608,7 @@ open class SCLAlertView: UIViewController {
         let btn = SCLButton()
         btn.layer.masksToBounds = true
         btn.setTitle(title, for: UIControlState())
+        btn.titleLabel?.numberOfLines = 2
         btn.titleLabel?.font = appearance.kButtonFont
         btn.customBackgroundColor = backgroundColor
         btn.customTextColor = textColor
@@ -767,7 +868,7 @@ open class SCLAlertView: UIViewController {
         circleView.addSubview(circleIconView!)
         let x = (appearance.kCircleHeight - appearance.kCircleIconHeight) / 2
         circleIconView!.frame = CGRect( x: x, y: x, width: appearance.kCircleIconHeight, height: appearance.kCircleIconHeight)
-        circleIconView?.layer.cornerRadius = circleIconView!.bounds.height / 2
+        circleIconView?.layer.cornerRadius = appearance.kCircleIconCornerRadius // circleIconView!.bounds.height / 2
         circleIconView?.layer.masksToBounds = true
         
         for txt in inputs {
